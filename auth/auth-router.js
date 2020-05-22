@@ -39,55 +39,38 @@ router.post("/register", (req, res) => {
 });
 
 router.post('/login', (req, res) => {
-  let {username, password} = req.body;
-  const {id} = req.params;
-
-//   function findByUsername(username) {
-//     return db('users').where({username}).first()
-// }
-
-db("users")
-  .where({ username })
-  .then(user => {
-    console.log(user);
-    res.status(200).json({ data: user })
-  })
-  .catch(error => {
-    res.status(404).json({ message: 'cannot find user' });
-  });
-
-
-  // db("users").where({id})
-  //     .first()
-  //     .then(someone => {
-  //         if (someone && bcryptjs.compareSync(password, someone.password)) {
-  //             const token = createToken(someone);
-  //             res.status(200).json({ message: `Welcome ${someone.username}`, token})
-  //         } else {
-  //             res.status(401).json({ message: 'Invalid Credentials!' })
-  //         }
-  //     })
-  //     .catch(err => {
-  //         console.log('error logging in', err)
-  //         res.status(500).json({ errorMessage: 'Could not log in!' })
-  //     })
-})
+  const { username, password } = req.body
+  
+  if(!username || !password) {
+      res.status(403).json({message: 'invalid username and password'})
+  } else {
+    db("users")
+      .where({ username })
+      .then(user => {
+        console.log(user)
+          if(user && bcryptjs.compareSync(password, user[0].password)) {
+          const token = createToken(user)
+          res.status(200).json({message: 'login successful', username: username, token})
+          }
+      })
+      .catch(err => {
+          console.log(err)
+          res.status(500).json({message: 'failed to login'})
+      })
+  } 
+});
 
 function createToken(user) {
   const payload = {
     sub: user.id,
     username: user.username,
-    role: user.role,
-  };
-
-  const secret = process.env.JWT_SECRET || "keepitsecret,keepitsafe!";
-
+  }
   const options = {
-    expiresIn: "1d",
-  };
-
-  return jwt.sign(payload, secret, options);
+      expiresIn: '1d'
+  }
+  return jwt.sign(payload, process.env.JWT_SECRET || 'duh', options)
 }
+
 
 module.exports = router;
 
