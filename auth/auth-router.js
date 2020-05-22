@@ -1,7 +1,3 @@
-// router.post('/login', (req, res) => {
-//   // implement login
-// });
-
 const db = require('../database/dbConfig.js');
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
