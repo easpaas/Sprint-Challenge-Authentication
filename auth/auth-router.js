@@ -38,24 +38,40 @@ router.post("/register", (req, res) => {
   }
 });
 
-// router.post('/login', (req, res) => {
-//   let {username, password} = req.body;
+router.post('/login', (req, res) => {
+  let {username, password} = req.body;
+  const {id} = req.params;
 
-//   Users.findBy({ username })
-//       .first()
-//       .then(someone => {
-//           if (someone && bcryptjs.compareSync(password, someone.password)) {
-//               const token = createToken(someone);
-//               res.status(200).json({ message: `Welcome ${someone.username}`, token})
-//           } else {
-//               res.status(401).json({ message: 'Invalid Credentials!' })
-//           }
-//       })
-//       .catch(err => {
-//           console.log('error logging in', err)
-//           res.status(500).json({ errorMessage: 'Could not log in!' })
-//       })
-// })
+//   function findByUsername(username) {
+//     return db('users').where({username}).first()
+// }
+
+db("users")
+  .where({ username })
+  .then(user => {
+    console.log(user);
+    res.status(200).json({ data: user })
+  })
+  .catch(error => {
+    res.status(404).json({ message: 'cannot find user' });
+  });
+
+
+  // db("users").where({id})
+  //     .first()
+  //     .then(someone => {
+  //         if (someone && bcryptjs.compareSync(password, someone.password)) {
+  //             const token = createToken(someone);
+  //             res.status(200).json({ message: `Welcome ${someone.username}`, token})
+  //         } else {
+  //             res.status(401).json({ message: 'Invalid Credentials!' })
+  //         }
+  //     })
+  //     .catch(err => {
+  //         console.log('error logging in', err)
+  //         res.status(500).json({ errorMessage: 'Could not log in!' })
+  //     })
+})
 
 function createToken(user) {
   const payload = {
